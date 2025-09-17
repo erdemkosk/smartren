@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartRen - Media File Renaming Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo">
+                    <div class="logo-hexagon">
+                        <div class="logo-s">S</div>
+                    </div>
+                </div>
+                <h1>SmartRen</h1>
+            </div>
+            <p>Smart renaming for modern media servers</p>
+            <button id="settingsBtn" class="btn btn-secondary" style="margin-top: 10px;">
+                ⚙️ Settings
+            </button>
+        </header>
+
+        <main class="main-content">
+            <!-- Folder Selection -->
+            <section class="folder-section">
+                <div class="folder-selector">
+                    <button id="selectFolderBtn" class="btn btn-primary">
+                        📁 Select Folder
+                    </button>
+                    <div id="selectedFolder" class="selected-folder">
+                        No folder selected yet
+                    </div>
+                </div>
+            </section>
+
+            <!-- Media Selection -->
+            <section class="media-section" id="mediaSection" style="display: none;">
+                <h2>🎬 Media Type and Search</h2>
+                <div class="media-type-selector">
+                    <label class="radio-group">
+                        <input type="radio" name="mediaType" value="tv" checked>
+                        <span>📺 TV Series</span>
+                    </label>
+                    <label class="radio-group">
+                        <input type="radio" name="mediaType" value="manual">
+                        <span>✏️ Manual Entry</span>
+                    </label>
+                </div>
+                
+                <!-- TV Series Search -->
+                <div id="searchContainer" class="search-container">
+                    <input type="text" id="mediaSearch" placeholder="Enter series name..." class="search-input">
+                    <button id="searchBtn" class="btn btn-primary">🔍 Search</button>
+                </div>
+                
+                <!-- Manual Entry Input -->
+                <div id="manualInputContainer" class="manual-input-container" style="display: none;">
+                    <div class="manual-inputs">
+                        <input type="text" id="manualSeriesName" placeholder="Enter series name manually..." class="manual-series-input">
+                        <input type="number" id="manualSeasonNumber" placeholder="Season number (e.g., 1)" class="manual-season-input" min="1" max="99" value="1">
+                    </div>
+                    <button id="confirmManualSeriesBtn" class="btn btn-primary">✅ Confirm</button>
+                </div>
+                
+                <div id="searchResults" class="search-results" style="display: none;">
+                    <!-- Search results will be loaded here -->
+                </div>
+                
+                <!-- Season Selection -->
+                <div id="seasonSelection" class="season-selection" style="display: none;">
+                    <h3>📺 Select Season</h3>
+                    <div class="season-inputs">
+                        <label for="seasonNumber">Season Number:</label>
+                        <input type="number" id="seasonNumber" placeholder="1" class="season-input" min="1" max="99" value="1">
+                        <button id="confirmSeasonBtn" class="btn btn-primary">✅ Confirm Season</button>
+                    </div>
+                </div>
+                
+            </section>
+
+
+            <!-- Preview -->
+            <section class="preview-section" id="previewSection" style="display: none;">
+                <h2>👁️ Renaming Preview</h2>
+                
+                <div class="sort-options">
+                    <label class="radio-group">
+                        <input type="radio" name="sortType" value="name" checked>
+                        <span>📝 Sort by Name</span>
+                    </label>
+                    <label class="radio-group">
+                        <input type="radio" name="sortType" value="date">
+                        <span>📅 Sort by Date</span>
+                    </label>
+                    <label class="radio-group">
+                        <input type="radio" name="sortType" value="size">
+                        <span>💾 Sort by Size</span>
+                    </label>
+                </div>
+                
+                <div id="previewList" class="preview-list">
+                    <!-- Preview will be loaded here -->
+                </div>
+                
+                <div class="actions">
+                    <button id="renameBtn" class="btn btn-danger">
+                        ✏️ Rename Files
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <h2>✅ Operation Results</h2>
+                <div id="resultsList" class="results-list">
+                    <!-- Results will be loaded here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+        
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>⚙️ Settings</h2>
+                    <button id="closeSettingsBtn" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <h3>🔑 TMDB API Configuration</h3>
+                    <p class="info-text">
+                        This app uses The Movie Database (TMDB) API to fetch movie and TV series information. 
+                        You need a free API key to use this feature.
+                    </p>
+                    
+                    <div class="api-section">
+                        <label for="apiKeyInput">API Key:</label>
+                        <input type="password" id="apiKeyInput" placeholder="Enter your TMDB API key..." class="api-input">
+                        <button id="saveApiBtn" class="btn btn-primary">💾 Save API Key</button>
+                        <button id="clearApiBtn" class="btn btn-secondary">🗑️ Clear API Key</button>
+                    </div>
+                    
+                    <div class="api-status" id="apiStatus">
+                        <span class="status-indicator">❌</span>
+                        <span class="status-text">No API key configured</span>
+                    </div>
+                    
+                    <div class="help-section">
+                        <h4>📖 How to get a free TMDB API key:</h4>
+                        <ol>
+                            <li>Go to <a href="https://www.themoviedb.org/settings/api" target="_blank">TMDB API Settings</a></li>
+                            <li>Create a free account (if you don't have one)</li>
+                            <li>Click "Request an API Key"</li>
+                            <li>Select "Developer" (free option)</li>
+                            <li>Fill in the application details:
+                                <ul>
+                                    <li><strong>Application Name:</strong> SmartRen</li>
+                                    <li><strong>Application Summary:</strong> Media file renaming tool</li>
+                                </ul>
+                            </li>
+                            <li>Copy your API key and paste it above</li>
+                        </ol>
+                        
+                        <div class="note">
+                            <strong>💡 Note:</strong> Your API key is stored locally on your computer and never shared with anyone.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
