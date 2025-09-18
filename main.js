@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
-const fs = require('fs-extra');
+const fs = require('fs').promises;
+const fsSync = require('fs');
 const TMDBAPI = require('./tmdb');
 
 let mainWindow;
@@ -102,6 +103,18 @@ ipcMain.handle('search-media', async (event, query, type, userApiKey) => {
   }
 });
 
+// TMDB API dil ayarını güncelle
+ipcMain.handle('set-tmdb-language', async (event, language) => {
+  try {
+    tmdb.setLanguage(language);
+    console.log('TMDB API language updated in main process:', language);
+    return true;
+  } catch (error) {
+    console.error('Error setting TMDB language:', error);
+    return false;
+  }
+});
+
 ipcMain.handle('get-media-details', async (event, id, type, userApiKey) => {
   try {
     // Use user's API key if provided, otherwise use default
@@ -185,9 +198,14 @@ async function scanMediaFiles(folderPath) {
 // Dosya yeniden adlandırma fonksiyonu
 async function renameFile(oldPath, newPath) {
   try {
-    await fs.move(oldPath, newPath);
+    await fs.rename(oldPath, newPath);
     return { success: true, oldPath, newPath };
   } catch (error) {
     return { success: false, oldPath, newPath, error: error.message };
   }
 }
+
+// Renderer process'e TMDB API instance'ını gönder
+ipcMain.handle('get-tmdb-api', () => {
+  return tmdb;
+});

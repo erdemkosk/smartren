@@ -1,4 +1,3 @@
-const axios = require('axios');
 const config = require('./config');
 
 class TMDBAPI {
@@ -7,23 +6,30 @@ class TMDBAPI {
         this.apiKey = config.TMDB_API_KEY;
         this.baseURL = 'https://api.themoviedb.org/3';
         this.imageBaseURL = 'https://image.tmdb.org/t/p/w500';
+        this.language = config.DEFAULT_LANGUAGE; // Default language
         
         if (this.apiKey === 'YOUR_TMDB_API_KEY_HERE') {
             console.warn('⚠️ TMDB API anahtarı ayarlanmamış! Lütfen config.js dosyasında API anahtarınızı ayarlayın.');
         }
     }
 
+    // Dil ayarını değiştir
+    setLanguage(lang) {
+        this.language = lang;
+    }
+
+    // Mevcut dili al
+    getLanguage() {
+        return this.language;
+    }
+
     // Film arama
     async searchMovie(query) {
         try {
-            const response = await axios.get(`${this.baseURL}/search/movie`, {
-                params: {
-                    api_key: this.apiKey,
-                    query: query,
-                    language: 'tr-TR'
-                }
-            });
-            return response.data.results;
+            const url = `${this.baseURL}/search/movie?api_key=${this.apiKey}&query=${encodeURIComponent(query)}&language=${this.language}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.results;
         } catch (error) {
             console.error('Film arama hatası:', error);
             return [];
@@ -33,14 +39,10 @@ class TMDBAPI {
     // Dizi arama
     async searchTV(query) {
         try {
-            const response = await axios.get(`${this.baseURL}/search/tv`, {
-                params: {
-                    api_key: this.apiKey,
-                    query: query,
-                    language: 'tr-TR'
-                }
-            });
-            return response.data.results;
+            const url = `${this.baseURL}/search/tv?api_key=${this.apiKey}&query=${encodeURIComponent(query)}&language=${this.language}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.results;
         } catch (error) {
             console.error('Dizi arama hatası:', error);
             return [];
@@ -50,13 +52,10 @@ class TMDBAPI {
     // Film detayları
     async getMovieDetails(movieId) {
         try {
-            const response = await axios.get(`${this.baseURL}/movie/${movieId}`, {
-                params: {
-                    api_key: this.apiKey,
-                    language: 'tr-TR'
-                }
-            });
-            return response.data;
+            const url = `${this.baseURL}/movie/${movieId}?api_key=${this.apiKey}&language=${this.language}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.error('Film detay hatası:', error);
             return null;
@@ -66,13 +65,10 @@ class TMDBAPI {
     // Dizi detayları
     async getTVDetails(tvId) {
         try {
-            const response = await axios.get(`${this.baseURL}/tv/${tvId}`, {
-                params: {
-                    api_key: this.apiKey,
-                    language: 'tr-TR'
-                }
-            });
-            return response.data;
+            const url = `${this.baseURL}/tv/${tvId}?api_key=${this.apiKey}&language=${this.language}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.error('Dizi detay hatası:', error);
             return null;
@@ -82,13 +78,10 @@ class TMDBAPI {
     // Dizi sezonları
     async getTVSeasons(tvId) {
         try {
-            const response = await axios.get(`${this.baseURL}/tv/${tvId}`, {
-                params: {
-                    api_key: this.apiKey,
-                    language: 'tr-TR'
-                }
-            });
-            return response.data.seasons;
+            const url = `${this.baseURL}/tv/${tvId}?api_key=${this.apiKey}&language=${this.language}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.seasons;
         } catch (error) {
             console.error('Sezon bilgisi hatası:', error);
             return [];
@@ -98,13 +91,10 @@ class TMDBAPI {
     // Dizi bölümleri
     async getTVEpisodes(tvId, seasonNumber) {
         try {
-            const response = await axios.get(`${this.baseURL}/tv/${tvId}/season/${seasonNumber}`, {
-                params: {
-                    api_key: this.apiKey,
-                    language: 'tr-TR'
-                }
-            });
-            return response.data.episodes;
+            const url = `${this.baseURL}/tv/${tvId}/season/${seasonNumber}?api_key=${this.apiKey}&language=${this.language}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.episodes;
         } catch (error) {
             console.error('Bölüm bilgisi hatası:', error);
             return [];

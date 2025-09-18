@@ -24,6 +24,11 @@ const saveApiBtn = document.getElementById('saveApiBtn');
 const clearApiBtn = document.getElementById('clearApiBtn');
 const apiStatus = document.getElementById('apiStatus');
 
+// Language elements
+const languageSelect = document.getElementById('languageSelect');
+const saveLanguageBtn = document.getElementById('saveLanguageBtn');
+const languageStatus = document.getElementById('languageStatus');
+
 // Manual entry elements
 const searchContainer = document.getElementById('searchContainer');
 const manualInputContainer = document.getElementById('manualInputContainer');
@@ -686,3 +691,226 @@ async function confirmSeason() {
         renameBtn.disabled = false;
     }
 }
+
+// Language Management Functions
+async function loadLanguagePreference() {
+    const savedLanguage = localStorage.getItem('smartren_language') || 'en-US';
+    console.log('Loading language preference:', savedLanguage);
+    
+    languageSelect.value = savedLanguage;
+    updateLanguageStatus(savedLanguage);
+    
+    // Update TMDB API language in main process
+    try {
+        const success = await ipcRenderer.invoke('set-tmdb-language', savedLanguage);
+        if (success) {
+            console.log('TMDB API language loaded in main process:', savedLanguage);
+        } else {
+            console.error('Failed to load TMDB API language in main process');
+        }
+    } catch (error) {
+        console.error('Error loading TMDB API language:', error);
+    }
+    
+    // Also update local TMDB API instance if available
+    if (window.tmdbAPI) {
+        window.tmdbAPI.setLanguage(savedLanguage);
+        console.log('Local TMDB API language loaded:', savedLanguage);
+        console.log('Current local TMDB API language:', window.tmdbAPI.getLanguage());
+    }
+}
+
+async function saveLanguagePreference() {
+    const selectedLanguage = languageSelect.value;
+    console.log('=== SAVE LANGUAGE CLICKED ===');
+    console.log('Saving language preference:', selectedLanguage);
+    
+    // Save to localStorage
+    localStorage.setItem('smartren_language', selectedLanguage);
+    console.log('Language saved to localStorage:', selectedLanguage);
+    
+    // Update TMDB API language in main process
+    try {
+        const success = await ipcRenderer.invoke('set-tmdb-language', selectedLanguage);
+        if (success) {
+            console.log('TMDB API language updated in main process:', selectedLanguage);
+        } else {
+            console.error('Failed to update TMDB API language in main process');
+        }
+    } catch (error) {
+        console.error('Error updating TMDB API language:', error);
+    }
+    
+    // Also update local TMDB API instance if available
+    if (window.tmdbAPI) {
+        console.log('TMDB API available, updating local language...');
+        window.tmdbAPI.setLanguage(selectedLanguage);
+        console.log('Local TMDB API language updated to:', selectedLanguage);
+        console.log('Current local TMDB API language:', window.tmdbAPI.getLanguage());
+    }
+    
+    updateLanguageStatus(selectedLanguage);
+    
+    // Show success message
+    console.log('About to show notification...');
+    const config = require('./config');
+    const languageNames = config.SUPPORTED_LANGUAGES;
+    const languageName = languageNames[selectedLanguage] || selectedLanguage;
+    console.log('Language name for notification:', languageName);
+    showNotification(`✅ Language saved successfully! Content will now be displayed in ${languageName}`, 'success');
+    console.log('Notification called');
+}
+
+function updateLanguageStatus(language) {
+    const config = require('./config');
+    const languageNames = config.SUPPORTED_LANGUAGES;
+    
+    const statusText = `Current: ${languageNames[language] || language}`;
+    const statusIndicator = languageNames[language] ? languageNames[language].split(' ')[0] : '🌍';
+    
+    languageStatus.querySelector('.status-indicator').textContent = statusIndicator;
+    languageStatus.querySelector('.status-text').textContent = statusText;
+}
+
+// Notification function
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .notification-icon {
+            font-size: 18px;
+        }
+        .notification-message {
+            flex: 1;
+            font-weight: 500;
+        }
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notification-close:hover {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
+    `;
+    
+    if (!document.querySelector('#notification-styles')) {
+        style.id = 'notification-styles';
+        document.head.appendChild(style);
+    }
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideIn 0.3s ease-out reverse';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }
+    }, 5000);
+    
+    // Close button functionality
+    const closeBtn = notification.querySelector('.notification-close');
+    closeBtn.addEventListener('click', () => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideIn 0.3s ease-out reverse';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }
+    });
+}
+
+// Language event listeners
+saveLanguageBtn.addEventListener('click', saveLanguagePreference);
+
+// Debug: Dil değişikliğini test et
+window.testLanguageChange = async function() {
+    console.log('=== Testing Language Change ===');
+    console.log('localStorage language:', localStorage.getItem('smartren_language'));
+    console.log('languageSelect value:', languageSelect.value);
+    
+    if (window.tmdbAPI) {
+        console.log('Current TMDB API language:', window.tmdbAPI.getLanguage());
+        window.tmdbAPI.setLanguage('tr-TR');
+        console.log('New TMDB API language:', window.tmdbAPI.getLanguage());
+    } else {
+        console.log('TMDB API not available');
+        console.log('Trying to get TMDB API...');
+        try {
+            window.tmdbAPI = await ipcRenderer.invoke('get-tmdb-api');
+            if (window.tmdbAPI) {
+                console.log('TMDB API obtained successfully');
+                console.log('Current TMDB API language:', window.tmdbAPI.getLanguage());
+            }
+        } catch (error) {
+            console.error('Error getting TMDB API:', error);
+        }
+    }
+    console.log('=== End Test ===');
+};
+
+// Load language preference on startup
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // TMDB API instance'ını al
+        window.tmdbAPI = await ipcRenderer.invoke('get-tmdb-api');
+        console.log('TMDB API loaded successfully');
+        
+        // Dil tercihini yükle
+        await loadLanguagePreference();
+    } catch (error) {
+        console.error('Error loading TMDB API:', error);
+    }
+});

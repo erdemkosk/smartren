@@ -840,3 +840,56 @@ body {
         width: 100%;
     }
 }
+
+/* Language Settings Styles */
+.language-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.language-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.language-select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    background: white;
+    margin-bottom: 15px;
+    transition: border-color 0.3s ease;
+}
+
+.language-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.language-status {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #e8f5e8;
+    border-radius: 6px;
+    border: 1px solid #c3e6c3;
+    margin-top: 15px;
+}
+
+.language-status .status-indicator {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.language-status .status-text {
+    color: #2d5a2d;
+    font-weight: 500;
+}

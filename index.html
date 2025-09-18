@@ -153,6 +153,34 @@
                         <span class="status-text">No API key configured</span>
                     </div>
                     
+                    <h3>🌍 Language Settings</h3>
+                    <p class="info-text">
+                        Choose the language for movie and TV series information from TMDB.
+                    </p>
+                    
+                    <div class="language-section">
+                        <label for="languageSelect">Content Language:</label>
+                        <select id="languageSelect" class="language-select">
+                            <option value="en-US">🇺🇸 English</option>
+                            <option value="tr-TR">🇹🇷 Türkçe</option>
+                            <option value="es-ES">🇪🇸 Español</option>
+                            <option value="fr-FR">🇫🇷 Français</option>
+                            <option value="de-DE">🇩🇪 Deutsch</option>
+                            <option value="it-IT">🇮🇹 Italiano</option>
+                            <option value="pt-BR">🇧🇷 Português</option>
+                            <option value="ru-RU">🇷🇺 Русский</option>
+                            <option value="ja-JP">🇯🇵 日本語</option>
+                            <option value="ko-KR">🇰🇷 한국어</option>
+                            <option value="zh-CN">🇨🇳 中文</option>
+                        </select>
+                        <button id="saveLanguageBtn" class="btn btn-primary">💾 Save Language</button>
+                    </div>
+                    
+                    <div class="language-status" id="languageStatus">
+                        <span class="status-indicator">🌍</span>
+                        <span class="status-text">Current: English</span>
+                    </div>
+                    
                     <div class="help-section">
                         <h4>📖 How to get a free TMDB API key:</h4>
                         <ol>
