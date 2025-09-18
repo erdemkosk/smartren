@@ -111,33 +111,17 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          artifacts/smartren-macos-x64/*.dmg
-          artifacts/smartren-macos-arm64/*.dmg
-          artifacts/smartren-windows-x64/*.exe
-          artifacts/smartren-linux-x64/*.AppImage
         tag_name: ${{ github.ref_name }}
         name: SmartRen ${{ github.ref_name }}
         body: |
           ## SmartRen ${{ github.ref_name }}
           
           ### What's New
-          - Smart media file renaming for modern media servers
-          - Support for Plex, Jellyfin, Emby, and more
-          - TMDB API integration for automatic metadata
-          - Cross-platform support (macOS, Windows, Linux)
-          
-          ### Downloads
-          - **macOS (Intel)**: Download the .dmg file
-          - **macOS (Apple Silicon)**: Download the .dmg file  
-          - **Windows**: Download the .exe file
-          - **Linux**: Download the .AppImage file
-          
-          ### Installation
-          1. Download the appropriate file for your operating system
-          2. Run the installer
-          3. Get your free TMDB API key from https://www.themoviedb.org/settings/api
-          4. Start organizing your media files!
+          - 🌍 Multi-language support (11 languages)
+          - 🔧 GitHub Actions CI/CD fixes
+          - 🎨 Consistent icon design across platforms
+          - 🔔 Beautiful notification system
+          - 📱 Standalone executable with no external dependencies
           
           ### Features
           - 🎬 Automatic TV series detection
@@ -146,7 +130,14 @@ jobs:
           - 📺 Season and episode selection
           - 🎯 Plex-compatible naming
           - 🔄 Smart file sorting
+          - 🌍 Multi-language content support
+          
+          ### Installation
+          1. Download the appropriate file for your operating system
+          2. Run the installer
+          3. Get your free TMDB API key from https://www.themoviedb.org/settings/api
+          4. Start organizing your media files!
         draft: false
         prerelease: false
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
