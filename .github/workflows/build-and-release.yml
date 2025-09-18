@@ -45,20 +45,26 @@ jobs:
       run: npm run build -- --mac --x64
       env:
         CSC_IDENTITY_AUTO_DISCOVERY: false
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Build for macOS (Apple Silicon)
       if: matrix.platform == 'darwin' && matrix.arch == 'arm64'
       run: npm run build -- --mac --arm64
       env:
         CSC_IDENTITY_AUTO_DISCOVERY: false
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Build for Windows
       if: matrix.platform == 'win32'
       run: npm run build -- --win --x64
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Build for Linux
       if: matrix.platform == 'linux'
       run: npm run build -- --linux --x64
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Upload macOS Intel artifacts
       if: matrix.platform == 'darwin' && matrix.arch == 'x64'
